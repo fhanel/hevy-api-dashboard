@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Hevy • Workouts</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/frontend/styles.css" />
+  <script src="/frontend/shared.js"></script>
+</head>
+<body class="compact">
+
+  <!-- Top Nav -->
+  <header class="nav">
+    <div class="nav-inner">
+      <div class="nav-left">
+        <div class="brand"><a href="/frontend/index.html">Hevy API dashboard</a></div>
+        <nav class="navlinks" id="topnav">
+          <a href="/frontend/index.html">Dashboard</a>
+          <a href="/frontend/progression.html">Progression</a>
+          <a href="/frontend/data.html">Workouts</a>
+        </nav>
+      </div>
+      <div class="nav-right">
+        <a href="/frontend/settings.html" title="Settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </a>
+        <a class="ghost" id="syncBtn" href="#" title="Trigger sync">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+            <path d="M21 3v5h-5"></path>
+            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+            <path d="M3 21v-5h5"></path>
+          </svg>
+        </a>
+        <span class="badge" id="countsBadge" title="DB counts">…</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1>Workouts</h1>
+    <p class="muted">List of all workouts listed.</p>
+
+    <div class="card">
+      <div class="controls">
+        <label>Show <input id="limit" type="number" min="1" value="50" /></label>
+        <button id="reload" class="modern-button primary" type="button">Reload</button>
+      </div>
+
+      <div id="status" class="muted">Loading…</div>
+      <div id="error" class="muted" style="color:var(--danger); display:none"></div>
+
+      <table id="tbl" style="display:none">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Started</th>
+            <th>Ended</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="footer muted">Hevy API tracker by <a href="https://hanel.io" target="_blank" rel="noopener noreferrer">hanel.io</a></div>
+  </div>
+
+  <script>
+    // Nav active + counts + sync
+    (function () {
+      const here = location.pathname;
+      document.querySelectorAll('#topnav a').forEach(a=>{
+        if (a.getAttribute('href') === here) a.classList.add('active');
+      });
+    })();
+    (async function(){
+      try{
+        const res = await fetch('/_counts'); if(!res.ok) return;
+        const j = await res.json();
+        document.getElementById('countsBadge').textContent = `Workouts: ${j.workouts} • Sets: ${j.sets}`;
+      }catch{}
+    })();
+    setupSyncButton();
+
+    // Page logic
+    function showError(msg){ document.getElementById('status').style.display='none'; const el=document.getElementById('error'); el.textContent=msg; el.style.display='block'; }
+
+    function renderRows(rows){
+      const tbody = document.querySelector('#tbl tbody'); tbody.innerHTML='';
+      for(const r of rows){
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><a href="/frontend/workout-detail.html?id=${encodeURIComponent(r.id)}">${r.id}</a></td>
+          <td>${r.title ?? ''}</td>
+          <td>${formatDateTime(r.started_at)}</td>
+          <td>${formatDateTime(r.ended_at)}</td>
+          <td>${r.notes ?? ''}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+      document.getElementById('status').style.display='none';
+      document.getElementById('tbl').style.display='table';
+    }
+    async function load(){
+      try{
+        document.getElementById('status').style.display='block';
+        document.getElementById('tbl').style.display='none';
+        const limit = Number(document.getElementById('limit').value || 50);
+        const data = await apiCall(`/workouts?limit=${limit}`);
+        renderRows(data);
+      }catch(e){ showError(`Failed to load: ${e.message}`); }
+    }
+    document.getElementById('reload').addEventListener('click', load);
+    load().catch(err => handleAsyncError(err, 'Load'));
+  </script>
+</body>
+</html>

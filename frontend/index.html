@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/frontend/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="/frontend/shared.js"></script>
+</head>
+<body class="consistency">
+
+  <!-- Top Nav -->
+  <header class="nav">
+    <div class="nav-inner">
+      <div class="nav-left">
+        <div class="brand"><a href="/frontend/index.html">Hevy API dashboard</a></div>
+        <nav class="navlinks" id="topnav">
+          <a href="/frontend/index.html">Dashboard</a>
+          <a href="/frontend/progression.html">Progression</a>
+          <a href="/frontend/data.html">Workouts</a>
+        </nav>
+      </div>
+      <div class="nav-right">
+        <a href="/frontend/settings.html" title="Settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </a>
+        <a class="ghost" id="syncBtn" href="#" title="Trigger sync">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+            <path d="M21 3v5h-5"></path>
+            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+            <path d="M3 21v-5h5"></path>
+          </svg>
+        </a>
+      <span class="badge" id="countsBadge" title="DB counts">…</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1>Weekly workout data</h1>
+    <p class="muted">Track workouts and see trends over time.</p>
+
+    <!-- Pills -->
+    <div class="controls">
+      <div class="pills" id="rangePills" role="tablist" aria-label="Range selector">
+        <button class="pill small" data-range="last_month" role="tab" aria-selected="false">Last month</button>
+        <button class="pill small active" data-range="last_3_months" role="tab" aria-selected="true">Last 3 months</button>
+        <button class="pill small" data-range="this_year" role="tab" aria-selected="false">This year</button>
+        <button class="pill small" data-range="since_start" role="tab" aria-selected="false">Since start</button>
+      </div>
+    </div>
+
+    <!-- Heatmap -->
+    <section class="card">
+     
+
+      <div id="heatmap" class="heatmap">
+        <!-- header -->
+        <div></div>
+        <div class="heat-head">W</div>
+        <div class="heat-head">S</div>
+        <div class="heat-head">R</div>
+        <div class="heat-head">Mon</div>
+        <div class="heat-head">Tue</div>
+        <div class="heat-head">Wed</div>
+        <div class="heat-head">Thu</div>
+        <div class="heat-head">Fri</div>
+        <div class="heat-head">Sat</div>
+        <div class="heat-head">Sun</div>
+        <div class="heat-head">Comments</div>
+        <!-- rows injected here -->
+      </div>
+    </section>
+
+    <div class="grid">
+      <!-- Weekly Volume Chart -->
+      <section class="card">
+        <h2>Weekly Volume</h2>
+        <div class="chart-wrap">
+          <canvas id="volumeChart"></canvas>
+        </div>
+      </section>
+
+      <!-- Muscle sets per week -->
+      <section class="card">
+        <h2>Sets per Muscle Group (Weekly)</h2>
+        <div class="chart-wrap">
+          <canvas id="muscleChart"></canvas>
+        </div>
+      </section>
+    </div>
+
+    <div class="footer muted">Hevy API tracker by <a href="https://hanel.io" target="_blank" rel="noopener noreferrer">hanel.io</a></div>
+  </div>
+
+  <script>
+    // nav active + counts + quick sync
+    (function(){ const here=location.pathname; document.querySelectorAll('#topnav a').forEach(a=>{ if(a.getAttribute('href')===here) a.classList.add('active');});})();
+    (async function(){ try{ const r=await fetch('/_counts'); if(!r.ok) return; const j=await r.json(); document.getElementById('countsBadge').textContent=`Workouts: ${j.workouts} • Sets: ${j.sets}`;}catch{}})();
+    
+    setupSyncButton();
+
+
+    // Parse YYYY-MM-DD as UTC (stable for ISO week calc)
+    function parseYMD(dateStr){
+      const [y,m,d] = dateStr.split('-').map(Number);
+      return new Date(Date.UTC(y, (m||1)-1, d||1));
+    }
+    function isoWeekNumber(dateStr){
+      const d = parseYMD(dateStr);
+      d.setUTCHours(0,0,0,0);
+      d.setUTCDate(d.getUTCDate() + 3 - ((d.getUTCDay() + 6) % 7));
+      const week1 = new Date(Date.UTC(d.getUTCFullYear(),0,4));
+      const diff = (d - week1) / 86400000;
+      return 1 + Math.round((diff - 3 + ((week1.getUTCDay()+6)%7)) / 7);
+    }
+    function weekLabelIso(dateStr){ return `W${String(isoWeekNumber(dateStr)).padStart(2,'0')}`; }
+
+    function weekClass(wpw){
+      if (wpw <= 0) return 'wk-0';
+      if (wpw === 1) return 'wk-1';
+      if (wpw === 2) return 'wk-2';
+      if (wpw === 3) return 'wk-3';
+      return 'wk-4';
+    }
+
+    // Range → weeks (server expects ?weeks= lookback)
+    function weeksFromRange(range){
+      if(range === 'last_month'){
+        return 4; // ~4 weeks = 1 month
+      }
+      if(range === 'last_3_months'){
+        return 12; // ~12 weeks = 3 months
+      }
+      if(range === 'this_year'){
+        const now = new Date();
+        const yearStart = new Date(now.getFullYear(), 0, 1);
+        const MS_WEEK = 7*24*3600*1000;
+        const weeksSinceYearStart = Math.max(1, Math.ceil((now - yearStart)/MS_WEEK));
+        return weeksSinceYearStart;
+      }
+      if(range === 'since_start'){
+        return 520; // ~10y, backend will naturally cap by data. A bit extensive.
+      }
+      // custom
+      const n = Number(document.getElementById('weeks').value || 16);
+      return Math.min(Math.max(n,1),520);
+    }
+
+    // Build heatmap: left week label colored by wpw; day cells static colors
+    async function buildHeatmap(gridData, weeklySummary){
+      const container = document.getElementById('heatmap');
+      container.querySelectorAll('.heat-week').forEach(n=>n.remove());
+
+      // Load weekly comments
+      window.weeklyComments = await loadWeeklyComments();
+
+      // Day titles map
+      const dayMap = {};
+      for(const r of gridData){
+        (dayMap[r.week_start] ||= {})[r.weekday] = { count:r.count, title:r.title, workout_id:r.workout_id };
+      }
+
+      // WPW map
+      const wpwMap = {};
+      for(const r of weeklySummary){
+        wpwMap[r.week_start] = r.wpw;
+      }
+
+      const weekStarts = Array.from(new Set([
+        ...Object.keys(dayMap),
+        ...Object.keys(wpwMap)
+      ])).sort((a,b)=> parseYMD(a) - parseYMD(b));
+
+      for(const wk of weekStarts){
+        const row = document.createElement('div'); row.className='heat-week';
+
+        // Week label cell
+        const wpw = wpwMap[wk] ?? 0;
+        const label = document.createElement('div');
+        label.className = `week-label ${weekClass(wpw)}`;
+        label.title = `Workouts this week: ${wpw}`;
+        label.textContent = weekLabelIso(wk);
+        row.appendChild(label);
+
+        // Weekly stats cells)
+        const weekSummary = weeklySummary.find(w => w.week_start === wk);
+        
+        // Workouts column
+        const workoutsCell = document.createElement('div');
+        workoutsCell.className = 'week-stat';
+        workoutsCell.textContent = weekSummary ? weekSummary.wpw : '0';
+        workoutsCell.title = `Workouts: ${weekSummary ? weekSummary.wpw : 0}`;
+        row.appendChild(workoutsCell);
+        
+        // Sets column
+        const setsCell = document.createElement('div');
+        setsCell.className = 'week-stat';
+        setsCell.textContent = weekSummary ? weekSummary.spw : '0';
+        setsCell.title = `Sets: ${weekSummary ? weekSummary.spw : 0}`;
+        row.appendChild(setsCell);
+        
+        // Reps column
+        const repsCell = document.createElement('div');
+        repsCell.className = 'week-stat';
+        repsCell.textContent = weekSummary ? weekSummary.rpw : '0';
+        repsCell.title = `Reps: ${weekSummary ? weekSummary.rpw : 0}`;
+        row.appendChild(repsCell);
+
+        // 7 day cells
+        for(let wd=1; wd<=7; wd++){
+          const entry = (dayMap[wk]||{})[wd] || {count:0, title:'', workout_id:null};
+          const cell = document.createElement('div');
+          cell.className = `day ${entry.count > 0 ? 'has' : ''}`;
+          cell.title = entry.title || '';
+          
+          if (entry.workout_id && entry.count > 0) {
+            // Make it clickable if there's a workout
+            cell.style.cursor = 'pointer';
+            cell.addEventListener('click', () => {
+              window.location.href = `/frontend/workout-detail.html?id=${encodeURIComponent(entry.workout_id)}`;
+            });
+            const truncatedTitle = entry.title ? (entry.title.length > 12 ? entry.title.substring(0, 12) : entry.title) : '&nbsp;';
+            cell.innerHTML = `<span class="dot"></span><div class="title">${truncatedTitle}</div>`;
+          } else {
+            const truncatedTitle = entry.title ? (entry.title.length > 12 ? entry.title.substring(0, 12) : entry.title) : '&nbsp;';
+            cell.innerHTML = `<span class="dot"></span><div class="title">${truncatedTitle}</div>`;
+          }
+          
+          row.appendChild(cell);
+        }
+
+        // Comments column
+        const commentCell = document.createElement('div');
+        commentCell.className = 'comment-cell';
+        const existingComment = window.weeklyComments[wk] || '-';
+        commentCell.innerHTML = `<div class="comment-text" data-week="${wk}">${existingComment}</div>`;
+        
+        // Make comment cell clickable
+        commentCell.style.cursor = 'pointer';
+        commentCell.addEventListener('click', () => {
+          editWeeklyComment(wk, commentCell);
+        });
+        
+        row.appendChild(commentCell);
+
+        container.appendChild(row);
+      }
+    }
+
+    // Load weekly comments from API
+    async function loadWeeklyComments() {
+      try {
+        const comments = await apiCall('/weekly-comments');
+        return comments;
+      } catch (error) {
+        return {};
+      }
+    }
+
+    // Edit weekly comment inline
+    function editWeeklyComment(weekStart, commentCell) {
+      const commentText = commentCell.querySelector('.comment-text');
+      const currentText = commentText.textContent === '-' ? '' : commentText.textContent;
+      
+      // Create input field
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = currentText;
+      input.className = 'comment-input-edit';
+      input.style.width = '100%';
+      input.style.height = '100%';
+      input.style.border = 'none';
+      input.style.background = 'transparent';
+      input.style.color = 'var(--text)';
+      input.style.fontSize = '11px';
+      input.style.padding = '0 4px';
+      input.style.outline = 'none';
+      
+      // Replace text with input
+      commentText.style.display = 'none';
+      commentCell.appendChild(input);
+      input.focus();
+      input.select();
+      
+      // Handle save on blur or enter
+      const saveComment = async () => {
+        const newComment = input.value.trim();
+        
+        try {
+          await apiCall('/weekly-comments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              week_start: weekStart,
+              comment: newComment || null
+            })
+          });
+          
+          // Update the display
+          commentText.textContent = newComment || '-';
+          
+          // Update the stored comments
+          if (window.weeklyComments) {
+            if (newComment) {
+              window.weeklyComments[weekStart] = newComment;
+            } else {
+              delete window.weeklyComments[weekStart];
+            }
+          }
+        } catch (error) {
+          alert('Failed to save comment: ' + error.message);
+        }
+        
+        // Restore text display
+        commentText.style.display = 'flex';
+        input.remove();
+      };
+      
+      // Handle cancel on escape
+      const cancelEdit = () => {
+        commentText.style.display = 'flex';
+        input.remove();
+      };
+      
+      input.addEventListener('blur', saveComment);
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          saveComment();
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          cancelEdit();
+        }
+      });
+    }
+
+    let volumeChart = null;
+
+    function renderVolumeChart(rows){
+      const ctx = document.getElementById('volumeChart').getContext('2d');
+      
+      // Destroy existing chart if it exists
+      if (volumeChart) {
+        volumeChart.destroy();
+      }
+      
+      const labels = rows.map(r => weekLabelIso(r.week_start));
+      const data = rows.map(r => r.volume);
+      
+      volumeChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Volume (kg·reps)',
+            data: data,
+            borderColor: '#4cc2ff',
+            backgroundColor: 'rgba(76, 194, 255, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: {
+                color: '#e8f1f8'
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: {
+                color: '#8aa0b2'
+              },
+              grid: {
+                color: '#1b2430'
+              }
+            },
+            y: {
+              ticks: {
+                color: '#8aa0b2'
+              },
+              grid: {
+                color: '#1b2430'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    let muscleChart = null; // Global variable for muscle chart
+
+    function renderMuscles(rows){
+      // Collect all unique muscle groups from the data
+      const allMuscles = new Set();
+      const byWeek = {};
+      
+      for(const r of rows){
+        const wk = r.week_start;
+        allMuscles.add(r.muscle);
+        if(!byWeek[wk]){
+          byWeek[wk] = {week_start: wk};
+        }
+        byWeek[wk][r.muscle] = r.sets;
+      }
+      
+      // Sort muscle groups for consistent display
+      const sortedMuscles = Array.from(allMuscles).sort();
+      
+      // Prepare data for chart
+      const orderedWeeks = Object.keys(byWeek).sort((a,b)=> parseYMD(a) - parseYMD(b));
+      const labels = orderedWeeks.map(wk => weekLabelIso(wk));
+      
+      // Create datasets for each muscle group
+      const datasets = sortedMuscles.map((muscle, index) => {
+        const data = orderedWeeks.map(wk => byWeek[wk][muscle] || 0);
+        
+        // Generate colors for each muscle group
+        const colors = [
+          '#3B82F6', // Blue
+          '#EF4444', // Red  
+          '#10B981', // Green
+          '#F59E0B', // Yellow
+          '#8B5CF6', // Purple
+          '#EC4899', // Pink
+          '#06B6D4', // Cyan
+          '#84CC16', // Lime
+          '#F97316', // Orange
+          '#6366F1'  // Indigo
+        ];
+        
+        const baseColor = colors[index % colors.length];
+        return {
+          label: muscle,
+          data: data,
+          backgroundColor: baseColor + '20', // Light transparency
+          borderColor: baseColor,
+          originalBackgroundColor: baseColor + '20', // Store original for hover effects
+          originalBorderColor: baseColor, // Store original for hover effects
+          borderWidth: 2,
+          fill: false,
+          tension: 0.1,
+          pointRadius: 0,
+          pointHoverRadius: 0
+        };
+      });
+      
+      // Create or update the chart
+      const ctx = document.getElementById('muscleChart').getContext('2d');
+      if (muscleChart) {
+        muscleChart.destroy();
+      }
+      
+      muscleChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: datasets
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
+
+          scales: {
+            x: {
+              grid: {
+                color: '#374151'
+              },
+              ticks: {
+                color: '#9CA3AF'
+              }
+            },
+            y: {
+              beginAtZero: true,
+              max: 30,
+              grid: {
+                color: '#374151'
+              },
+              ticks: {
+                color: '#9CA3AF',
+                stepSize: 5
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                color: '#E5E7EB',
+                usePointStyle: true,
+                padding: 15,
+                font: {
+                  size: 11
+                }
+              },
+              onClick: function(e, legendItem, legend) {
+                return false;
+              },
+              onHover: function(e, legendItem, legend) {
+                const chart = legend.chart;
+                const datasets = chart.data.datasets;
+                const datasetIndex = legendItem.datasetIndex;
+                
+                // Reset all datasets to normal
+                datasets.forEach((dataset, i) => {
+                  dataset.borderColor = dataset.originalBorderColor;
+                  dataset.backgroundColor = dataset.originalBackgroundColor;
+                });
+                
+                // Fade out all except hovered
+                datasets.forEach((dataset, i) => {
+                  if (i !== datasetIndex) {
+                    dataset.borderColor = dataset.originalBorderColor + '40';
+                    dataset.backgroundColor = dataset.originalBackgroundColor + '10';
+                  }
+                });
+                
+                chart.update('none');
+              },
+              onLeave: function(e, legendItem, legend) {
+                const chart = legend.chart;
+                const datasets = chart.data.datasets;
+                
+                // Reset all datasets to normal
+                datasets.forEach((dataset, i) => {
+                  dataset.borderColor = dataset.originalBorderColor;
+                  dataset.backgroundColor = dataset.originalBackgroundColor;
+                });
+                
+                chart.update('none');
+              }
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+              backgroundColor: '#1F2937',
+              titleColor: '#F9FAFB',
+              bodyColor: '#E5E7EB',
+              borderColor: '#374151',
+              borderWidth: 1
+            }
+          }
+        }
+      });
+
+
+    }
+
+    async function loadAll(){
+      const pills = document.querySelectorAll('#rangePills .pill');
+      const active = document.querySelector('#rangePills .pill.active');
+      const range = active?.dataset.range || 'last_3_months';
+      const weeks = weeksFromRange(range);
+
+      // Cap weeks to API limits (most endpoints have a limit of 104 weeks)
+      const cappedWeeks = Math.min(weeks, 104);
+      const volumeWeeks = Math.min(weeks, 52); // weekly_volume has a lower limit
+
+      const [grid, summary, muscles, volume] = await Promise.all([
+        apiCall(`/stats/weekday_grid?weeks=${cappedWeeks}`),
+        apiCall(`/stats/weekly_summary?weeks=${cappedWeeks}`),
+        apiCall(`/stats/muscle_sets_weekly?weeks=${cappedWeeks}`),
+        apiCall(`/stats/weekly_volume?weeks=${volumeWeeks}`)
+      ]);
+      await buildHeatmap(grid, summary);
+      renderVolumeChart(volume);
+      renderMuscles(muscles);
+    }
+
+    // Pills behavior
+    const pillsWrap = document.getElementById('rangePills');
+
+    pillsWrap.addEventListener('click', (e)=>{
+      const btn = e.target.closest('.pill');
+      if(!btn) return;
+
+      // update active state
+      document.querySelectorAll('#rangePills .pill').forEach(b=>{
+        b.classList.toggle('active', b === btn);
+        b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
+      });
+
+
+      loadAll().catch(err => handleAsyncError(err, 'Load all'));
+    });
+
+
+    // Initial load
+    loadAll().catch(err => handleAsyncError(err, 'Initial load'));
+  </script>
+</body>
+</html>

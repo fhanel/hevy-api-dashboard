@@ -1,0 +1,679 @@
+/* ====== Theme & Resets ====== */
+:root{
+    --bg: #0b0f14;
+    --card: #11171f;
+    --muted: #8aa0b2;
+    --text: #e8f1f8;
+    --accent: #4cc2ff;
+    --accent-2:#6ee7b7;
+    --border: #1b2430;
+    --danger: #ff6b6b;
+    --shadow: 0 10px 30px rgba(0,0,0,0.25);
+    --radius: 14px;
+  
+    /* Consistency specific */
+    --day-off: #0f141c;      /* empty day cell */
+    --day-on:  #122437;      /* workout day cell (static) */
+    --wk0: #EF4444;          /* 0 workouts */
+    --wk1: #f5f10b;          /* 1 workout */
+    --wk2: #f5f10b;          /* 2 workouts */
+    --wk3: #10B981;          /* 3 workouts */
+    --wk4: #10B981;          /* 4+ workouts */
+  }
+  
+  *{ box-sizing: border-box; }
+  html, body { margin:0; padding:0; background:var(--bg); color:var(--text); font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+
+/* Keep centered layout stable across pages and OSes */
+html {
+    /* reserve space for vertical scrollbar on all pages, and on both sides */
+    scrollbar-gutter: stable both-edges;
+  }
+  
+  /* Fallback if browser doesn't support the above */
+  @supports not (scrollbar-gutter: stable both-edges) {
+    html { overflow-y: scroll; }
+  }
+  
+  /* Absolutely prevent tiny horizontal overflow from nudging centering */
+  html, body {
+    overflow-x: hidden;
+  }
+  
+  /* Make sure nav + page content use the exact same centering model */
+  :root { --page-max: 1100px; }
+  
+  .nav-inner,
+  .container {
+    max-width: var(--page-max);
+    margin-inline: auto;      /* centers identical on all pages */
+    padding-inline: 20px;     /* same interior padding */
+    width: 100%;
+  }
+  
+  /* ====== Layout ====== */
+  .container { max-width: 1100px; margin: 24px auto; padding: 0 20px; }
+  .grid { display:grid; gap:5px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+  
+  /* ====== Top Nav ====== */
+  .nav {
+    position: sticky; top:0; z-index: 10;
+    backdrop-filter: blur(8px);
+    background: color-mix(in srgb, var(--bg) 86%, transparent);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner { max-width: 1100px; margin: 0 auto; padding: 10px 20px; display:flex; gap:14px; align-items:center; justify-content: space-between; flex-wrap: nowrap; }
+  .nav-left { display: flex; gap: 14px; align-items: center; }
+  .nav-right { display: flex; gap: 14px; align-items: center; flex-shrink: 0; }
+  .nav-right a {
+    color: var(--muted); text-decoration:none; padding:6px; border-radius: 10px; display:inline-flex; gap:8px; align-items:center;
+    /* Fix navigation shifting by ensuring consistent sizing */
+    width: 36px;
+    height: 36px;
+    justify-content: center;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+    /* Prevent text from affecting button size */
+    white-space: nowrap;
+    /* Allow content to be visible */
+    overflow: visible;
+  }
+  
+  .nav-right a svg {
+    width: 24px !important;
+    height: 24px !important;
+    flex-shrink: 0;
+  }
+  
+  .nav-right .badge {
+    padding: 4px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .nav-right a:hover{ background: var(--card); color:var(--text); }
+  .nav-right a.active{ 
+    background: var(--accent); 
+    color:#00131c; 
+    font-weight:600;
+    /* Ensure active state doesn't change dimensions */
+    border-color: transparent;
+  }
+  .brand { font-weight: 700; letter-spacing: 0.2px; }
+  .brand a { color: var(--text); text-decoration: none; }
+  .navlinks { display:flex; gap:10px; }
+  .navlinks a{
+    color: var(--muted); text-decoration:none; padding:8px 10px; border-radius: 10px; display:inline-flex; gap:8px; align-items:center;
+    /* Fix navigation shifting by ensuring consistent sizing */
+    width: 100px;
+    height: 36px;
+    justify-content: center;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+    /* Prevent text from affecting button size */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .navlinks a:hover{ background: var(--card); color:var(--text); }
+  .navlinks a.active{ 
+    background: var(--accent); 
+    color:#00131c; 
+    font-weight:600;
+    /* Ensure active state doesn't change dimensions */
+    border-color: transparent;
+  }
+  
+  /* ====== Cards & Elements ====== */
+  .card {
+    background: var(--card);
+    border: none;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 18px;
+    overflow: hidden;
+  }
+  
+  h1 { font-size: 26px; margin: 18px 0 8px; }
+  h2 { font-size: 20px; margin: 8px 0 12px; }
+  
+  /* Center chart titles */
+  .card h2 { text-align: center; }
+  p.muted, .muted { color: var(--muted); }
+  
+  .controls { display:flex; flex-wrap:wrap; gap: 10px 16px; align-items:center; margin-bottom: 12px; }
+  label { display:flex; align-items:center; gap:8px; }
+  input, select, button {
+    background: #0e141b; color: var(--text); border:1px solid var(--border);
+    border-radius: 10px; padding:8px 10px; outline: none;
+  }
+  button { cursor:pointer; }
+  button.ghost { background: transparent; }
+  button.ghost:hover{ background: #0e141b; }
+  
+  .badge { padding:2px 8px; border-radius:999px; border:1px solid var(--border); color: var(--muted); }
+  
+  /* Fix sync button sizing to prevent navigation shifting */
+  .navlinks a.ghost {
+    width: 80px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  
+  /* ====== Pills / Segmented Control ====== */
+  .pills { display:flex; gap:8px; flex-wrap:wrap; }
+  .pill {
+    appearance:none; border:none; padding:2px 2px; border-radius:999px;
+    background:#0e141b; color:var(--muted);
+    transition: transform .06s ease, background .15s ease, color .15s ease;
+  }
+  .pill:hover { transform: translateY(-1px); color:var(--text); }
+  .pill.active { background: var(--accent); color:#00131c; border-color: transparent; font-weight:600; }
+  .pill.small { padding:6px 10px; font-size: 13px; }
+  
+  /* ====== Unified Table Styling ====== */
+  table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    overflow: hidden; 
+    border-radius: 10px; 
+    font-size: 14px;
+  }
+  
+  /* Table headers */
+  th { 
+    background: var(--bg-secondary); 
+    color: var(--text); 
+    font-weight: 600; 
+    text-align: left; 
+    position: sticky; 
+    top: 0; 
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  
+  /* Table cells */
+  td { 
+    padding: 6px 12px; 
+    color: var(--text); 
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+    vertical-align: top;
+  }
+  
+  /* Notes column - allow wrapping but limit height */
+  td:nth-child(5) {
+    white-space: normal;
+    max-width: 300px;
+    max-height: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+    vertical-align: top;
+    word-wrap: break-word;
+  }
+  
+  /* Hover effect */
+  tbody tr:hover { 
+    background: var(--bg-secondary); 
+  }
+  
+  /* Muscle group headers - consistent across all tables */
+  .muscle-group-header-row {
+    background: #0f1620 !important;
+  }
+  
+  .muscle-group-header-cell {
+    font-weight: 600 !important;
+    color: var(--accent) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    font-size: 12px !important;
+    padding: 8px 12px !important;
+    border-bottom: 1px solid var(--border) !important;
+  }
+  
+  /* Right-align numeric columns */
+  .numeric-column {
+    text-align: right;
+  }
+  
+  /* Compact table styling for workout details */
+  .compact-table {
+    font-size: 14px;
+  }
+  
+  .compact-table th {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  
+  .compact-table td {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+  
+  /* Tight spacing for workout detail tables */
+  .workout-table th:nth-child(1) { width: 70%; }
+  .workout-table th:nth-child(2) { width: 5%; }
+  .workout-table th:nth-child(3) { width: 12%; }
+  .workout-table th:nth-child(4) { width: 13%; }
+  
+  .workout-table th:nth-child(2),
+  .workout-table th:nth-child(3),
+  .workout-table th:nth-child(4) {
+    text-align: right;
+  }
+  
+  .workout-table td:nth-child(1) {
+    padding: 6px 12px;
+  }
+  
+  .workout-table td:nth-child(2),
+  .workout-table td:nth-child(3),
+  .workout-table td:nth-child(4) {
+    text-align: right;
+    padding: 6px 2px;
+  }
+  
+  /* Remove borders between individual sets in workout tables */
+  .workout-table tr {
+    border-bottom: none !important;
+  }
+  
+  .workout-table tr.exercise-last-set {
+    border-bottom: 1px solid var(--border) !important;
+  }
+  
+  .workout-table tr.muscle-group-header-row {
+    border-bottom: 1px solid var(--border) !important;
+  }
+  
+  .workout-table td {
+    border-bottom: none !important;
+  }
+  
+  /* Settings table specific styling */
+  .settings-table {
+    font-size: 14px !important;
+    width: 100% !important;
+    border-collapse: collapse !important;
+    overflow: hidden !important;
+    border-radius: 10px !important;
+  }
+  
+  .settings-table th {
+    background: var(--bg-secondary) !important;
+    color: var(--text) !important;
+    font-weight: 600 !important;
+    text-align: left !important;
+    position: sticky !important;
+    top: 0 !important;
+    padding: 8px 12px !important;
+    border-bottom: 1px solid var(--border) !important;
+  }
+  
+  .settings-table td {
+    padding: 6px 12px !important;
+    color: var(--text) !important;
+    border-bottom: 1px solid var(--border) !important;
+  }
+  
+  .settings-table tbody tr:hover {
+    background: var(--bg-secondary) !important;
+  }
+  
+  .settings-table .numeric-column {
+    text-align: right !important;
+    font-weight: bold !important;
+    color: #28a745 !important;
+  }
+  
+  
+  /* ====== Consistency: compact mode ====== */
+  /* ====== Consistency / Compact mode (shared) ====== */
+body.consistency,
+body.compact { font-size: 14px; }
+
+body.consistency .card,
+body.compact .card { padding: 14px; }
+
+body.consistency table,
+body.compact table { font-size: 13px; }
+
+body.consistency th, 
+body.consistency td,
+body.compact th, 
+body.compact td { padding: 8px 10px; }
+
+/* Unified chart scale */
+.chart-wrap { position:relative; height: 320px; width: 100%; }
+
+  
+  /* ====== Consistency: heatmap grid ====== */
+  .heatmap { display:grid; grid-template-columns: 68px 30px 30px 30px repeat(7, 1fr) 200px; gap: 4px; }
+  
+  /* Add gap between heatmap section and grid below */
+  section.card:has(.heatmap) {
+    margin-bottom: 5px;
+  }
+  .heat-head { font-weight:600; color:#cfe5f5; text-align:center; }
+  .heat-week { display:contents; }
+  
+  /* Weekly stats columns */
+  .week-stat {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    font-weight: 600;
+    padding: 2px 4px;
+  }
+  
+  /* Week label cell (tinted by WPW) */
+  .week-label {
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; color:#00131c; border-radius:10px; padding:2px 4px; min-height:22px;
+    background: var(--wk0); /* overridden via class */
+    border:1px solid var(--border);
+  }
+  
+  /* Day cells: static colors */
+  .day {
+    position:relative;
+    border-radius:10px;
+    height: 22px;
+    padding: 2px;
+    border:1px solid var(--border);
+    background: var(--day-off);
+  }
+  .day.has { background: var(--day-on); }
+  .day .title { font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height: 18px; padding: 0 4px; display: flex; align-items: center;  }
+  .day .dot  { position:absolute; top:6px; right:6px; width:6px; height:6px; border-radius:50%; background:#9cc; display:none; }
+  .day.has .dot { display:block; }
+  
+  /* Clickable workout tiles */
+  .day.has[style*="cursor: pointer"] {
+    transition: all 0.2s ease;
+  }
+  .day.has[style*="cursor: pointer"]:hover {
+    background: var(--accent);
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .day.has[style*="cursor: pointer"]:hover .title {
+    color: white;
+    font-weight: 600;
+  }
+  .day.has[style*="cursor: pointer"]:hover .dot {
+    background: white;
+  }
+
+  /* Comments column styling */
+  .comment-cell {
+    position: relative;
+    border-radius: 10px;
+    height: 22px;
+    padding: 2px;
+    border: 1px solid var(--border);
+    background: var(--bg-secondary);
+    transition: all 0.2s ease;
+  }
+
+  .comment-cell:hover {
+    background: var(--bg);
+    border-color: var(--accent);
+  }
+
+  .comment-text {
+    width: 100%;
+    height: 100%;
+    padding: 0 4px;
+    color: var(--muted);
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 18px;
+  }
+
+  .comment-cell:hover .comment-text {
+    color: var(--text);
+  }
+
+  .comment-input-edit {
+    width: 100% !important;
+    height: 100% !important;
+    border: none !important;
+    background: var(--bg) !important;
+    color: var(--text) !important;
+    font-size: 11px !important;
+    padding: 0 4px !important;
+    outline: none !important;
+    border-radius: 6px !important;
+  }
+  
+  /* Week tint palette via classes */
+  .wk-0 { background: var(--wk0) !important; }
+
+  /* ====== Modern Muscle Groups Styling ====== */
+  .muscle-groups-section {
+    margin: 24px 0;
+  }
+
+  .section-header {
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    margin: 0 0 8px 0;
+    color: var(--text);
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .section-description {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .input-group {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+    margin-bottom: 16px;
+  }
+
+  .modern-input {
+    flex: 1;
+    padding: 12px 16px;
+    background: var(--card);
+    color: var(--text);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    outline: none;
+  }
+
+  .modern-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(76, 194, 255, 0.1);
+  }
+
+  .modern-input::placeholder {
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .modern-button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+    white-space: nowrap;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modern-button.primary {
+    background: var(--accent);
+    color: #00131c;
+  }
+
+  .modern-button.primary:hover {
+    background: #3ab0ff;
+  }
+
+  .modern-button.danger {
+    background: var(--danger);
+    color: white;
+    padding: 6px 10px;
+    font-size: 12px;
+    width: 60px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modern-button.danger:hover {
+    background: #ff5252;
+  }
+
+  .status-message {
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .status-message.success {
+    background: rgba(110, 231, 183, 0.1);
+    color: var(--accent-2);
+    border: 1px solid rgba(110, 231, 183, 0.2);
+  }
+
+  .status-message.error {
+    background: rgba(255, 107, 107, 0.1);
+    color: var(--danger);
+    border: 1px solid rgba(255, 107, 107, 0.2);
+  }
+
+  .muscle-groups-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .muscle-group-card {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    max-width: 180px;
+    height: 40px;
+  }
+
+  .muscle-group-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .muscle-group-card:hover {
+    background: #1a2029;
+    color: var(--text);
+    border-color: var(--border);
+    transform: none;
+    box-shadow: none;
+  }
+
+  .muscle-group-card:hover::before {
+    opacity: 0;
+  }
+
+  .muscle-group-name {
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    grid-column: 1 / -1;
+  }
+
+  .loading-spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--border);
+    border-top: 2px solid var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 12px;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .loading-state p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .wk-1 { background: var(--wk1) !important; }
+  .wk-2 { background: var(--wk2) !important; }
+  .wk-3 { background: var(--wk3) !important; }
+  .wk-4 { background: var(--wk4) !important; }
+  
+  /* ====== Footer ====== */
+  .footer { margin: 30px 0 20px; color: var(--muted); font-size: 14px; text-align:center; }
+  
+  /* ====== Normal text links always white ====== */
+  a:not(.navlinks a) {
+    color: white !important;
+  }
+  

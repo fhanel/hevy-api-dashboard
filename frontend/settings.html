@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Hevy Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="/frontend/shared.js"></script>
+</head>
+<body class="consistency">
+    <!-- Top Nav -->
+    <header class="nav">
+        <div class="nav-inner">
+            <div class="nav-left">
+                <div class="brand"><a href="/frontend/index.html">Hevy API dashboard</a></div>
+                <nav class="navlinks" id="topnav">
+                    <a href="/frontend/index.html">Dashboard</a>
+                    <a href="/frontend/progression.html">Progression</a>
+                    <a href="/frontend/data.html">Workouts</a>
+                </nav>
+            </div>
+            <div class="nav-right">
+                <a href="/frontend/settings.html" class="active" title="Settings">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                  </svg>
+                </a>
+                <a class="ghost" id="syncBtn" href="#" title="Trigger sync">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                    <path d="M21 3v5h-5"></path>
+                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                    <path d="M3 21v-5h5"></path>
+                  </svg>
+                </a>
+                <span class="badge" id="countsBadge" title="DB counts">…</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h1>Settings</h1>
+        
+        <!-- Muscle Group Management -->
+        <div class="card">
+            <h2>Muscle Group Management</h2>
+           
+            
+            <!-- Muscle Group Mapping Preference -->
+            <div style="margin: 20px 0;">
+                <h3 style="margin: 0 0 10px 0; color: #fff; font-size: 16px;">Mapping Preference</h3>
+                <p style="margin: 0 0 15px 0; color: #8aa0b2; font-size: 14px;">Choose which muscle group mapping to use in your charts and statistics.</p>
+                
+                
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="radio" name="muscleMapping" value="hevy" id="hevyMapping" checked>
+                        <span>Use Hevy Mapping</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="radio" name="muscleMapping" value="custom" id="customMapping">
+                        <span>Use Custom Muscle Groups</span>
+                    </label>
+                </div>
+                <div id="mappingStatus" style="margin-top: 10px; padding: 8px; border-radius: 4px; display: none;"></div>
+            </div>
+
+            <!-- Custom Muscle Groups -->
+            <div class="muscle-groups-section">
+                <div class="section-header">
+                    <h3 class="section-title">Custom Muscle Groups</h3>
+                    <p class="section-description">Create your own muscle group categories to simplify exercise organization.</p>
+                </div>
+                
+                <div class="input-group">
+                    <input type="text" id="newMuscleGroupName" placeholder="Enter muscle group name..." class="modern-input">
+                    <button id="createMuscleGroup" class="modern-button primary">Create</button>
+                </div>
+                
+                <div id="muscleGroupStatus" class="status-message" style="display: none;"></div>
+                
+                <div id="customMuscleGroups" class="muscle-groups-grid">
+                    <div class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <p>Loading custom muscle groups...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exercise Mappings -->
+            <div style="margin: 20px 0;">
+                <h3 style="margin: 0 0 10px 0; color: #fff; font-size: 16px;">Exercise Mappings</h3>
+                <p style="margin: 0 0 15px 0; color: #888; font-size: 14px;">Map your exercises to custom muscle groups. Exercises without custom mappings will use Hevy's primary muscle groups.</p>
+                
+                <button id="loadExerciseMappings" class="modern-button primary" style="margin-bottom: 10px;">Load Exercise Mappings</button>
+                <div id="exerciseMappingStatus" style="margin-bottom: 10px; padding: 8px; border-radius: 4px; display: none;"></div>
+                
+                <div id="exerciseMappingTable" style="border: 1px solid #444; border-radius: 4px;">
+                    <p style="text-align: center; padding: 20px; color: #888;">Click "Load Exercise Mappings" to view and edit your exercise mappings</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Nav active + counts + sync
+        (function () {
+            const here = location.pathname;
+            document.querySelectorAll('#topnav a').forEach(a=>{
+                if (a.getAttribute('href') === here) a.classList.add('active');
+            });
+        })();
+        (async function(){
+            try{
+                const res = await fetch('/_counts'); if(!res.ok) return;
+                const j = await res.json();
+                document.getElementById('countsBadge').textContent = `Workouts: ${j.workouts} • Sets: ${j.sets}`;
+            }catch{}
+        })();
+        setupSyncButton();
+
+        // Global variables
+        let customMuscleGroups = [];
+        let exerciseMappings = [];
+
+        // Load preferences and custom muscle groups on page load
+        loadMappingPreference();
+        loadCustomMuscleGroups();
+
+        // Load current mapping preference
+        async function loadMappingPreference() {
+            try {
+                const response = await fetch('/mapping-preference');
+                const preference = await response.json();
+                
+                if (preference.mapping_type === 'custom') {
+                    document.getElementById('customMapping').checked = true;
+                } else {
+                    document.getElementById('hevyMapping').checked = true;
+                }
+            } catch (error) {
+                document.getElementById('hevyMapping').checked = true;
+            }
+        }
+
+        // Handle mapping preference change
+        document.querySelectorAll('input[name="muscleMapping"]').forEach(radio => {
+            radio.addEventListener('change', async function() {
+                if (this.checked) {
+                    await saveMappingPreference(this.value);
+                }
+            });
+        });
+
+        // Save mapping preference
+        async function saveMappingPreference(mappingType) {
+            const statusDiv = document.getElementById('mappingStatus');
+            
+            try {
+                const response = await fetch('/mapping-preference', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({mapping_type: mappingType})
+                });
+                
+                if (response.ok) {
+                } else {
+                    const error = await response.json();
+                    statusDiv.style.display = 'block';
+                    statusDiv.style.background = '#dc3545';
+                    statusDiv.innerHTML = `Error: ${error.detail || 'Failed to save preference'}`;
+                }
+            } catch (error) {
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = '#dc3545';
+                statusDiv.innerHTML = `Error: ${error.message}`;
+            }
+        }
+
+        // Create custom muscle group
+        document.getElementById('createMuscleGroup').addEventListener('click', async () => {
+            const nameInput = document.getElementById('newMuscleGroupName');
+            const statusDiv = document.getElementById('muscleGroupStatus');
+            const button = document.getElementById('createMuscleGroup');
+            
+            const name = nameInput.value.trim();
+            if (!name) {
+                statusDiv.style.display = 'block';
+                statusDiv.className = 'status-message error';
+                statusDiv.innerHTML = 'Please enter a muscle group name';
+                return;
+            }
+            
+            try {
+                button.disabled = true;
+                button.textContent = 'Creating...';
+                
+                const response = await fetch('/custom-muscle-groups', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({name: name})
+                });
+                
+                if (response.ok) {
+                    nameInput.value = '';
+                    statusDiv.style.display = 'block';
+                    statusDiv.className = 'status-message success';
+                    statusDiv.innerHTML = `Custom muscle group "${name}" created successfully`;
+                    loadCustomMuscleGroups(); // Reload the list
+                } else {
+                    const error = await response.json();
+                    statusDiv.style.display = 'block';
+                    statusDiv.className = 'status-message error';
+                    statusDiv.innerHTML = `Error: ${error.detail || error.message || 'Unknown error'}`;
+                }
+            } catch (error) {
+                statusDiv.style.display = 'block';
+                statusDiv.className = 'status-message error';
+                statusDiv.innerHTML = `Error: ${error.message}`;
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Create';
+            }
+        });
+
+        // Load custom muscle groups
+        async function loadCustomMuscleGroups() {
+            const container = document.getElementById('customMuscleGroups');
+            
+            try {
+                const response = await fetch('/custom-muscle-groups');
+                customMuscleGroups = await response.json();
+                
+                if (customMuscleGroups.length === 0) {
+                    container.innerHTML = `
+                        <div class="loading-state">
+                            <p>No custom muscle groups created yet</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '';
+                customMuscleGroups.forEach(group => {
+                    html += `
+                        <div class="muscle-group-card">
+                            <h4 class="muscle-group-name">${group.name}</h4>
+                            <button onclick="deleteMuscleGroup(${group.id}, '${group.name}')" class="modern-button danger">Delete</button>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+                
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="loading-state">
+                        <p style="color: var(--danger);">Error loading custom muscle groups</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Delete custom muscle group
+        async function deleteMuscleGroup(groupId, groupName) {
+            if (!confirm(`Are you sure you want to delete "${groupName}"? This will also remove all exercise mappings for this group.`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/custom-muscle-groups/${groupId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    loadCustomMuscleGroups(); // Reload the list
+                    if (exerciseMappings.length > 0) {
+                        loadExerciseMappings(); // Reload exercise mappings
+                    }
+                } else {
+                    const error = await response.json();
+                    alert(`Error: ${error.detail}`);
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        // Load exercise mappings
+        document.getElementById('loadExerciseMappings').addEventListener('click', loadExerciseMappings);
+
+        async function loadExerciseMappings() {
+            const statusDiv = document.getElementById('exerciseMappingStatus');
+            const tableDiv = document.getElementById('exerciseMappingTable');
+            const button = document.getElementById('loadExerciseMappings');
+            
+            try {
+                button.disabled = true;
+                button.textContent = 'Loading...';
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = '#6c757d';
+                statusDiv.innerHTML = 'Loading exercise mappings...';
+                
+                const response = await fetch('/exercise-mappings');
+                exerciseMappings = await response.json();
+                
+                if (exerciseMappings.length === 0) {
+                    statusDiv.style.background = '#ffc107';
+                    statusDiv.innerHTML = 'No exercises found. Run a sync to populate exercise data.';
+                    tableDiv.innerHTML = '<p style="text-align: center; padding: 20px; color: #888;">No exercises found</p>';
+                    return;
+                }
+                
+                renderExerciseMappingTable();
+                
+                statusDiv.style.background = '#28a745';
+                statusDiv.innerHTML = `Loaded ${exerciseMappings.length} exercise mappings successfully`;
+                
+            } catch (error) {
+                statusDiv.style.background = '#dc3545';
+                statusDiv.innerHTML = `Error loading exercise mappings: ${error.message}`;
+                tableDiv.innerHTML = '<p style="text-align: center; padding: 20px; color: #dc3545;">Error loading exercise mappings</p>';
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Load Exercise Mappings';
+            }
+        }
+
+        // Render exercise mapping table
+        function renderExerciseMappingTable() {
+            const tableDiv = document.getElementById('exerciseMappingTable');
+            
+            let html = '<table class="settings-table">';
+            html += '<thead><tr>';
+            html += '<th>Exercise</th>';
+            html += '<th>Hevy Group</th>';
+            html += '<th>Custom Group</th>';
+            html += '<th class="numeric-column">Sets Used</th>';
+            html += '</tr></thead><tbody>';
+            
+            exerciseMappings.forEach((exercise, index) => {
+                html += `<tr>`;
+                html += `<td>${exercise.exercise_title}</td>`;
+                html += `<td>${exercise.primary_muscle_group || '-'}</td>`;
+                
+                // Custom group selector
+                html += `<td>`;
+                html += `<select onchange="updateExerciseMapping('${exercise.exercise_title}', this.value)" style="background: #444; color: white; border: 1px solid #555; border-radius: 3px; padding: 4px;">`;
+                html += `<option value="">Use Hevy Group</option>`;
+                customMuscleGroups.forEach(group => {
+                    const selected = exercise.custom_muscle_group_id === group.id ? 'selected' : '';
+                    html += `<option value="${group.id}" ${selected}>${group.name}</option>`;
+                });
+                html += `</select></td>`;
+                
+                html += `<td class="numeric-column">${exercise.usage_count}</td>`;
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            tableDiv.innerHTML = html;
+        }
+
+        // Update exercise mapping
+        async function updateExerciseMapping(exerciseTitle, customMuscleGroupId) {
+            try {
+                const response = await fetch('/exercise-mappings', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        exercise_title: exerciseTitle,
+                        custom_muscle_group_id: customMuscleGroupId ? parseInt(customMuscleGroupId) : null
+                    })
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    alert(`Error updating mapping: ${error.detail}`);
+                    // Reload to reset the select
+                    loadExerciseMappings();
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+                // Reload to reset the select
+                loadExerciseMappings();
+            }
+        }
+
+
+    </script>
+    
+    <div class="footer muted">Hevy API tracker by <a href="https://hanel.io" target="_blank" rel="noopener noreferrer">hanel.io</a></div>
+</body>
+</html>

@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Workout Details</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/frontend/styles.css" />
+  <script src="/frontend/shared.js"></script>
+</head>
+<body class="compact">
+
+  <!-- Top Nav -->
+  <header class="nav">
+    <div class="nav-inner">
+      <div class="nav-left">
+        <div class="brand"><a href="/frontend/index.html">Hevy API dashboard</a></div>
+        <nav class="navlinks" id="topnav">
+          <a href="/frontend/index.html">Dashboard</a>
+          <a href="/frontend/progression.html">Progression</a>
+          <a href="/frontend/data.html">Workouts</a>
+        </nav>
+      </div>
+      <div class="nav-right">
+        <a href="/frontend/settings.html" title="Settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 1.82-.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </a>
+        <a class="ghost" id="syncBtn" href="#" title="Trigger sync">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+            <path d="M21 3v5h-5"></path>
+            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+            <path d="M3 21v-5h5"></path>
+          </svg>
+        </a>
+        <span class="badge" id="countsBadge" title="DB counts">…</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div id="loading" class="muted">Loading workout details...</div>
+    <div id="error" class="muted" style="color:var(--danger); display:none"></div>
+    
+    <div id="workout-details" style="display:none">
+      <!-- Single Card Container -->
+      <div class="card">
+        <!-- Workout Header -->
+        <h1 id="workout-title">Workout</h1>
+        <div class="workout-meta">
+          <div class="meta-item">
+            <strong>Date:</strong> <span id="workout-date"></span>
+          </div>
+          <div class="meta-item">
+            <strong>Started:</strong> <span id="workout-started"></span>
+          </div>
+          <div class="meta-item">
+            <strong>Ended:</strong> <span id="workout-ended"></span>
+          </div>
+          <div class="meta-item">
+            <strong>Duration:</strong> <span id="workout-duration"></span>
+          </div>
+        </div>
+        <div id="workout-notes" class="workout-notes" style="display:none">
+          <strong>Notes:</strong> <span id="workout-notes-text"></span>
+        </div>
+
+        <!-- Exercises Table -->
+        <div id="exercises-container">
+          <table id="workoutTable" class="workout-table">
+            <thead><tr></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <!-- Back Button -->
+        <div style="margin-top: 20px;">
+          <a href="/frontend/data.html" class="modern-button secondary">← Back to Workouts</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer muted">Hevy API tracker by <a href="https://hanel.io" target="_blank" rel="noopener noreferrer">hanel.io</a></div>
+  </div>
+
+  <script>
+    // Nav active + counts + sync
+    (function () {
+      const here = location.pathname;
+      document.querySelectorAll('#topnav a').forEach(a=>{
+        if (a.getAttribute('href') === here) a.classList.add('active');
+      });
+    })();
+    (async function(){
+      try{
+        const res = await fetch('/_counts'); if(!res.ok) return;
+        const j = await res.json();
+        document.getElementById('countsBadge').textContent = `Workouts: ${j.workouts} • Sets: ${j.sets}`;
+      }catch{}
+    })();
+    setupSyncButton();
+
+    // Utility functions
+    function formatDate(dateString) {
+      if (!dateString) return 'N/A';
+      const date = new Date(dateString);
+      return date.toLocaleString();
+    }
+
+    function formatDateOnly(dateString) {
+      if (!dateString) return 'N/A';
+      const date = new Date(dateString);
+      return date.toLocaleDateString();
+    }
+
+    function calculateDuration(started, ended) {
+      if (!started || !ended) return 'N/A';
+      const start = new Date(started);
+      const end = new Date(ended);
+      const diffMs = end - start;
+      const hours = Math.floor(diffMs / (1000 * 60 * 60));
+      const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+      return `${hours}h ${minutes}m`;
+    }
+
+    function groupSetsByMuscleGroup(sets) {
+      const muscleGroups = {};
+      
+      sets.forEach(set => {
+        const exerciseTitle = set.exercise_title || 'Unknown Exercise';
+        const muscleGroup = set.muscle_group || 'Other';
+        
+        // Use the muscle group from the API (respects user's mapping preference)
+        if (!muscleGroups[muscleGroup]) {
+          muscleGroups[muscleGroup] = {};
+        }
+        
+        // Group exercises within each muscle group
+        if (!muscleGroups[muscleGroup][exerciseTitle]) {
+          muscleGroups[muscleGroup][exerciseTitle] = [];
+        }
+        muscleGroups[muscleGroup][exerciseTitle].push(set);
+      });
+      
+      return muscleGroups;
+    }
+
+    function renderWorkoutDetails(workout) {
+      // Update workout header
+      document.getElementById('workout-title').textContent = workout.title || 'Untitled Workout';
+      document.getElementById('workout-date').textContent = formatDateOnly(workout.started_at);
+      document.getElementById('workout-started').textContent = formatDate(workout.started_at);
+      document.getElementById('workout-ended').textContent = formatDate(workout.ended_at);
+      document.getElementById('workout-duration').textContent = calculateDuration(workout.started_at, workout.ended_at);
+
+      // Show notes if available
+      if (workout.notes && workout.notes.trim()) {
+        document.getElementById('workout-notes-text').textContent = workout.notes;
+        document.getElementById('workout-notes').style.display = 'block';
+      }
+
+      // Group sets by muscle group
+      const groupedByMuscle = groupSetsByMuscleGroup(workout.sets || []);
+      const thead = document.querySelector('#workoutTable thead tr');
+      const tbody = document.querySelector('#workoutTable tbody');
+      thead.innerHTML = '';
+      tbody.innerHTML = '';
+
+      if (workout.sets && workout.sets.length === 0) {
+        thead.innerHTML = '<th>Exercise</th><th>Set</th><th>Weight</th><th>Reps</th>';
+        tbody.innerHTML = '<tr><td colspan="4" class="muted">No sets found</td></tr>';
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('workout-details').style.display = 'block';
+        return;
+      }
+
+      // Table headers
+      thead.innerHTML = '<th>Exercise</th><th>Set</th><th>Weight</th><th>Reps</th>';
+
+      // Sort muscle groups for consistent display
+      const sortedMuscleGroups = Object.keys(groupedByMuscle).sort();
+
+      // Render each muscle group
+      sortedMuscleGroups.forEach(muscleGroup => {
+        const exercises = groupedByMuscle[muscleGroup];
+        
+        // Add muscle group header row
+        const headerRow = document.createElement('tr');
+        headerRow.className = 'muscle-group-header-row';
+        headerRow.innerHTML = `<td colspan="4" class="muscle-group-header-cell">${muscleGroup}</td>`;
+        tbody.appendChild(headerRow);
+        
+        // Render each exercise within this muscle group
+        Object.keys(exercises).forEach(exerciseTitle => {
+          const sets = exercises[exerciseTitle];
+          
+          // Sort sets by set_index if available, otherwise by order
+          const sortedSets = sets.sort((a, b) => {
+            if (a.set_index !== undefined && b.set_index !== undefined) {
+              return a.set_index - b.set_index;
+            }
+            return 0;
+          });
+          
+          // Add each set as a table row
+          sortedSets.forEach((set, index) => {
+            const tr = document.createElement('tr');
+            
+            // Add exercise-last-set class to the last set of this exercise
+            if (index === sortedSets.length - 1) {
+              tr.classList.add('exercise-last-set');
+            }
+            
+            tr.innerHTML = `
+              <td>${exerciseTitle}</td>
+              <td>${index + 1}</td>
+              <td>${set.weight_kg ? `${set.weight_kg}kg` : 'Bodyweight'}</td>
+              <td>${set.reps || ''}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        });
+      });
+
+      // Show the workout details
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('workout-details').style.display = 'block';
+    }
+
+    function showError(message) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('error').textContent = message;
+      document.getElementById('error').style.display = 'block';
+    }
+
+    // Load workout details
+    async function loadWorkout() {
+      try {
+        // Get workout ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const workoutId = urlParams.get('id');
+        
+        if (!workoutId) {
+          showError('No workout ID provided');
+          return;
+        }
+
+        const response = await fetch(`/workouts/${encodeURIComponent(workoutId)}`);
+        if (!response.ok) {
+          if (response.status === 404) {
+            showError('Workout not found');
+          } else {
+            showError(`Failed to load workout: HTTP ${response.status}`);
+          }
+          return;
+        }
+
+        const workout = await response.json();
+        renderWorkoutDetails(workout);
+      } catch (error) {
+        showError(`Failed to load workout: ${error.message}`);
+      }
+    }
+
+    // Load workout on page load
+    loadWorkout();
+  </script>
+
+  <style>
+    .workout-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    .meta-item {
+      padding: 0.5rem;
+      background: var(--bg-secondary);
+      border-radius: 4px;
+    }
+
+    .workout-notes {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: var(--bg-secondary);
+      border-radius: 4px;
+      border-left: 4px solid var(--accent);
+    }
+
+    /* Workout table specific styling - now handled by unified CSS */
+    #workoutTable {
+      margin-top: 20px;
+    }
+
+    /* Muscle group headers matching progression.html */
+    .muscle-group-header-row {
+      background: #0f1620 !important;
+    }
+    
+    .muscle-group-header-cell {
+      font-weight: 600 !important;
+      color: var(--accent) !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.5px !important;
+      font-size: 12px !important;
+      padding: 8px 12px !important;
+    }
+
+    @media (max-width: 768px) {
+      .workout-meta {
+        grid-template-columns: 1fr;
+      }
+      
+      #workoutTable {
+        font-size: 14px;
+      }
+      
+      #workoutTable th,
+      #workoutTable td {
+        padding: 8px;
+      }
+    }
+  </style>
+</body>
+</html>

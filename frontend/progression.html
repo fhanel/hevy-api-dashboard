@@ -1,0 +1,857 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Hevy • Progression</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/frontend/styles.css" />
+  <script src="/frontend/shared.js"></script>
+</head>
+<body class="compact">
+
+  <!-- Top Nav -->
+  <header class="nav">
+    <div class="nav-inner">
+      <div class="nav-left">
+        <div class="brand"><a href="/frontend/index.html">Hevy API dashboard</a></div>
+      <nav class="navlinks" id="topnav">
+        <a href="/frontend/index.html">Dashboard</a>
+        <a href="/frontend/progression.html">Progression</a>
+          <a href="/frontend/data.html">Workouts</a>
+      </nav>
+      </div>
+      <div class="nav-right">
+        <a href="/frontend/settings.html" title="Settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </a>
+        <a class="ghost" id="syncBtn" href="#" title="Trigger sync">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+            <path d="M21 3v5h-5"></path>
+            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+            <path d="M3 21v-5h5"></path>
+          </svg>
+        </a>
+      <span class="badge" id="countsBadge" title="DB counts">…</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1>Exercise Progression</h1>
+    <p class="muted">Track progression for one or more exercises over time.</p>
+
+    <!-- Pills -->
+      <div class="controls">
+      <div class="pills" id="rangePills" role="tablist" aria-label="Range selector">
+        <button class="pill small" data-range="last_month" role="tab" aria-selected="false">Last month</button>
+        <button class="pill small active" data-range="last_3_months" role="tab" aria-selected="true">Last 3 months</button>
+        <button class="pill small" data-range="this_year" role="tab" aria-selected="false">This year</button>
+        <button class="pill small" data-range="since_start" role="tab" aria-selected="false">Since start</button>
+      </div>
+    </div>
+
+    <section class="card progression-container">
+      <div class="progression-layout">
+        <!-- Left Panel: Controls -->
+        <div class="controls-panel">
+          <h3>Exercise Selection</h3>
+          
+          <div class="control-group">
+            <label>Muscle Group</label>
+            <select id="muscleGroupSel">
+              <option value="">Select muscle group...</option>
+            </select>
+          </div>
+          
+          <div class="control-group">
+            <label>Exercises
+              <div class="exercise-list-header">
+                <label class="select-all-label">
+                  <input type="checkbox" id="selectAllCheckbox" class="select-all-checkbox">
+                  <span>Select All</span>
+                </label>
+              </div>
+              <div id="exerciseCheckboxes" class="exercise-checkboxes">
+                <p class="muted">Select a muscle group first</p>
+              </div>
+            </label>
+          </div>
+          
+          <div class="control-group">
+            <label>Metric</label>
+          <select id="metricSel">
+            <option value="epley_1rm">Epley 1RM (est)</option>
+            <option value="best_weight">Best Weight (≥ min reps)</option>
+            <option value="tonnage">Tonnage (kg·reps)</option>
+          </select>
+          </div>
+          
+          <div class="control-group" id="minRepsGroup" style="display: none;">
+            <label>Min reps 
+              <input id="progressionMinReps" type="number" min="1" value="5" />
+        </label>
+          </div>
+          
+
+          
+
+      </div>
+
+        <!-- Right Panel: Chart -->
+        <div class="chart-panel">
+          <h3>Progression Chart</h3>
+          <div class="chart-wrap">
+            <canvas id="progChart"></canvas>
+            <div id="empty" class="muted" style="display:none; text-align: center;">No data found. Select exercises to see progression chart.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Best PRs -->
+    <section class="card" style="margin-top: 5px;">
+      <h2>Best PRs</h2>
+      <div class="controls" style="margin-top:6px;">
+        <label>Min reps (for best weight)
+          <input id="prsMinReps" type="number" min="1" max="30" value="5" />
+        </label>
+        <button id="loadPRs" class="modern-button primary" type="button">Reload PRs</button>
+      </div>
+      <table id="prsTbl" class="compact-table">
+        <thead><tr></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <div class="footer muted">Hevy API tracker by <a href="https://hanel.io" target="_blank" rel="noopener noreferrer">hanel.io</a></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Nav active + counts + sync
+    (function () {
+      const here = location.pathname;
+      document.querySelectorAll('#topnav a').forEach(a=>{
+        if (a.getAttribute('href') === here) a.classList.add('active');
+      });
+    })();
+    (async function(){
+      try{
+        const res = await fetch('/_counts'); if(!res.ok) return;
+        const j = await res.json();
+        document.getElementById('countsBadge').textContent = `Workouts: ${j.workouts} • Sets: ${j.sets}`;
+      }catch{}
+    })();
+    setupSyncButton();
+
+    // Page logic
+    let chartInstance=null; function destroyChart(){ if(chartInstance){ chartInstance.destroy(); chartInstance=null; } }
+
+    let muscleGroupData = {};
+
+    async function loadMuscleGroups(){
+      // Get user's mapping preference
+      const preference = await apiCall('/mapping-preference');
+      const mappingType = preference.mapping_type || 'hevy';
+      
+      let data;
+      if (mappingType === 'custom') {
+        // Use same logic as muscle_sets_weekly: custom mapping with fallback to primary
+        const exercises = await apiCall('/exercise-mappings');
+        
+        // Group exercises by muscle group (custom with fallback to primary)
+        data = {};
+        for (const exercise of exercises) {
+          // Same logic as backend: custom_muscle_group_name OR primary_muscle_group OR 'Other'
+          // Apply INITCAP() equivalent: capitalize first letter of each word
+          const rawGroupName = exercise.custom_muscle_group_name || exercise.primary_muscle_group || 'Other';
+          const groupName = rawGroupName.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+          
+          if (!data[groupName]) {
+            data[groupName] = [];
+          }
+          data[groupName].push({
+            exercise_title: exercise.exercise_title,
+            usage_count: exercise.usage_count
+          });
+        }
+      } else {
+        // Use primary muscle groups only
+        const rawData = await apiCall('/exercises/by-muscle-group');
+        
+        // Apply INITCAP() to muscle group names
+        data = {};
+        for (const [rawGroupName, exercises] of Object.entries(rawData)) {
+          const groupName = rawGroupName.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+          data[groupName] = exercises;
+        }
+      }
+      
+      muscleGroupData = data;
+      
+      const sel = document.getElementById('muscleGroupSel');
+      sel.innerHTML = '<option value="">Select muscle group...</option>';
+      
+      // Sort muscle groups alphabetically
+      const sortedGroups = Object.keys(data).sort();
+      for(const group of sortedGroups){
+        const option = document.createElement('option');
+        option.value = group;
+        option.textContent = `${group} (${data[group].length} exercises)`;
+        sel.appendChild(option);
+      }
+    }
+
+    function updateExerciseCheckboxes(){
+      const selectedGroup = document.getElementById('muscleGroupSel').value;
+      const container = document.getElementById('exerciseCheckboxes');
+      const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+      
+      if(!selectedGroup || !muscleGroupData[selectedGroup]){
+        container.innerHTML = '<p class="muted">Select a muscle group first</p>';
+        selectAllCheckbox.checked = false;
+        selectAllCheckbox.disabled = true;
+        return;
+      }
+      
+      const exercises = muscleGroupData[selectedGroup];
+      container.innerHTML = '';
+      selectAllCheckbox.disabled = false;
+      selectAllCheckbox.checked = false;
+      
+      // Sort exercises by usage count (most used first)
+      const sortedExercises = exercises.sort((a, b) => b.usage_count - a.usage_count);
+      
+      for(const exercise of sortedExercises){
+        const div = document.createElement('div');
+        div.className = 'exercise-checkbox-item';
+        div.innerHTML = `
+          <label class="checkbox-label">
+            <input type="checkbox" value="${exercise.exercise_title}" class="exercise-checkbox">
+            <span class="exercise-name">${exercise.exercise_title}</span>
+            <span class="usage-count">(${exercise.usage_count} sets)</span>
+          </label>
+        `;
+        container.appendChild(div);
+      }
+      
+      // Update select all state
+      updateSelectAllState();
+    }
+
+
+
+    function updateSelectAllState(){
+      const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+      const exerciseCheckboxes = document.querySelectorAll('.exercise-checkbox');
+      
+      if (exerciseCheckboxes.length === 0) {
+        selectAllCheckbox.checked = false;
+        selectAllCheckbox.indeterminate = false;
+        return;
+      }
+      
+      const checkedCount = document.querySelectorAll('.exercise-checkbox:checked').length;
+      
+      if (checkedCount === 0) {
+        selectAllCheckbox.checked = false;
+        selectAllCheckbox.indeterminate = false;
+      } else if (checkedCount === exerciseCheckboxes.length) {
+        selectAllCheckbox.checked = true;
+        selectAllCheckbox.indeterminate = false;
+      } else {
+        selectAllCheckbox.checked = false;
+        selectAllCheckbox.indeterminate = true;
+      }
+    }
+
+    function toggleSelectAll(){
+      const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+      const exerciseCheckboxes = document.querySelectorAll('.exercise-checkbox');
+      
+      exerciseCheckboxes.forEach(checkbox => {
+        checkbox.checked = selectAllCheckbox.checked;
+      });
+    }
+
+    function getSelectedExercises(){
+      const checkboxes = document.querySelectorAll('.exercise-checkbox:checked');
+      return Array.from(checkboxes).map(cb => cb.value);
+    }
+
+    // Range → weeks (same as index.html)
+    function weeksFromRange(range){
+      if(range === 'last_month'){
+        return 4; // ~4 weeks = 1 month
+      }
+      if(range === 'last_3_months'){
+        return 12; // ~12 weeks = 3 months
+      }
+      if(range === 'this_year'){
+        const now = new Date();
+        const yearStart = new Date(now.getFullYear(), 0, 1);
+        const MS_WEEK = 7*24*3600*1000;
+        const weeksSinceYearStart = Math.max(1, Math.ceil((now - yearStart)/MS_WEEK));
+        return weeksSinceYearStart;
+      }
+      if(range === 'since_start'){
+        return 520; // ~10y, backend will naturally cap by data
+      }
+      return 12; // default
+    }
+
+    async function loadProgression(){
+      const selectedExercises = getSelectedExercises();
+      if(selectedExercises.length === 0){
+        // Clear the chart and show empty state instead of alert
+        destroyChart();
+        document.getElementById('empty').style.display = 'block';
+        return;
+      }
+      
+      const metric = document.getElementById('metricSel').value;
+      const minReps = Number(document.getElementById('progressionMinReps').value || 5);
+      
+      // Get selected range from pills
+      const activePill = document.querySelector('#rangePills .pill.active');
+      const range = activePill?.dataset.range || 'last_3_months';
+      const weeks = weeksFromRange(range);
+      
+      // Cap weeks to API limit (progression endpoint has a limit of 104 weeks)
+      const cappedWeeks = Math.min(weeks, 104);
+      
+      const params = new URLSearchParams({
+        exercises: selectedExercises.join(','),
+        metric,
+        weeks: String(cappedWeeks)
+      });
+      
+      if(metric === 'best_weight') params.set('min_reps', String(minReps));
+
+      const data = await apiCall(`/stats/progression?${params.toString()}`);
+      const exerciseData = data.data || {};
+      
+      document.getElementById('empty').style.display = Object.keys(exerciseData).length ? 'none' : 'block';
+
+      // Prepare chart data - use actual workout dates
+      const allWorkoutDates = new Set();
+      Object.values(exerciseData).forEach(points => {
+        points.forEach(point => {
+          if (point.workout_date) {
+            allWorkoutDates.add(point.workout_date);
+          }
+        });
+      });
+      
+      const sortedWorkoutDates = Array.from(allWorkoutDates).sort();
+      const labels = sortedWorkoutDates.map(date => {
+        const parsedDate = new Date(date);
+        if (isNaN(parsedDate.getTime())) {
+          return date; // Return raw string if parsing fails
+        }
+        return parsedDate.toLocaleDateString();
+      });
+
+      // Generate colors for each exercise
+      const colors = [
+        '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6',
+        '#EC4899', '#06B6D4', '#84CC16', '#F97316', '#6366F1'
+      ];
+
+      const datasets = selectedExercises.map((exercise, index) => {
+        const points = exerciseData[exercise] || [];
+        const dataMap = new Map(points.map(p => [p.workout_date, p.value]));
+        const data = sortedWorkoutDates.map(date => dataMap.get(date) || null);
+        
+        const color = colors[index % colors.length];
+        
+        return {
+          label: exercise,
+          data: data,
+          borderColor: color,
+          backgroundColor: color + '20',
+          borderWidth: 2,
+          fill: false,
+          tension: 0.1,
+          pointRadius: 4, // Show dots on all actual workout dates
+          pointHoverRadius: 6
+        };
+      });
+
+      destroyChart();
+      chartInstance = new Chart(document.getElementById('progChart').getContext('2d'), {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
+          scales: {
+            x: {
+              grid: { color: '#374151' },
+              ticks: { color: '#9CA3AF' }
+            },
+            y: {
+              beginAtZero: true,
+              grid: { color: '#374151' },
+              ticks: { color: '#9CA3AF' }
+            }
+          },
+          plugins: {
+            legend: {
+              labels: {
+                color: '#E5E7EB',
+                usePointStyle: true,
+                padding: 15,
+                font: { size: 11 }
+              }
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+              backgroundColor: '#1F2937',
+              titleColor: '#F9FAFB',
+              bodyColor: '#E5E7EB',
+              borderColor: '#374151',
+              borderWidth: 1
+            }
+          }
+        }
+      });
+    }
+
+    // Event listeners
+    document.getElementById('muscleGroupSel').addEventListener('change', function() {
+      updateExerciseCheckboxes();
+      // Auto-load progression after muscle group changes
+      setTimeout(loadProgression, 100);
+    });
+    
+    document.getElementById('metricSel').addEventListener('change', function(){
+      const minRepsGroup = document.getElementById('minRepsGroup');
+      minRepsGroup.style.display = this.value === 'best_weight' ? 'block' : 'none';
+      // Auto-load progression when metric changes
+      loadProgression();
+    });
+    
+    // Select all functionality
+    document.getElementById('selectAllCheckbox').addEventListener('change', function() {
+      toggleSelectAll();
+      // Auto-load progression when select all changes
+      setTimeout(loadProgression, 100);
+    });
+    
+    // Update select all state when individual checkboxes change
+    document.addEventListener('change', function(e) {
+      if (e.target.classList.contains('exercise-checkbox')) {
+        updateSelectAllState();
+        // Auto-load progression when individual exercise selection changes
+        loadProgression();
+      }
+    });
+    
+    // Range pills functionality
+    document.getElementById('rangePills').addEventListener('click', (e) => {
+      const btn = e.target.closest('.pill');
+      if (!btn) return;
+      
+      // Update active state
+      document.querySelectorAll('#rangePills .pill').forEach(b => {
+        b.classList.toggle('active', b === btn);
+        b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
+      });
+      
+      // Auto-load progression when date range changes
+      loadProgression();
+    });
+    
+    // Auto-load progression when min reps changes
+    document.getElementById('progressionMinReps').addEventListener('input', function() {
+      // Debounce the input to avoid too many API calls
+      clearTimeout(window.minRepsTimeout);
+      window.minRepsTimeout = setTimeout(loadProgression, 500);
+    });
+    
+    // PRs reload button
+    document.getElementById('loadPRs').addEventListener('click', ()=> loadPRs().catch(err => handleAsyncError(err, 'Load PRs')));
+    
+    // Auto-reload PRs when min reps changes
+    document.getElementById('prsMinReps').addEventListener('input', function() {
+      // Debounce the input to avoid too many API calls
+      clearTimeout(window.prsMinRepsTimeout);
+      window.prsMinRepsTimeout = setTimeout(loadPRs, 500);
+    });
+
+    // ----- Best PRs Functions (from stats.html) -----
+    function autoDetectSortKey(rows){
+      if(!rows.length) return null;
+      const sample = rows[0];
+      // Prefer epley/e1rm if present, else any numeric column
+      const prefer = ['epley_1rm','one_rm','e1rm','value','tonnage','best_weight','max_weight'];
+      for(const k of prefer){ if(k in sample && typeof sample[k] === 'number') return k; }
+      for(const k of Object.keys(sample)){ if(typeof sample[k] === 'number') return k; }
+      return null;
+    }
+
+    // Get muscle group data for grouping exercises
+    async function getMuscleGroupData(){
+      const preference = await apiCall('/mapping-preference');
+      const mappingType = preference.mapping_type || 'hevy';
+      
+      if (mappingType === 'custom') {
+        const exercises = await apiCall('/exercise-mappings');
+        const data = {};
+        for (const exercise of exercises) {
+          const rawGroupName = exercise.custom_muscle_group_name || exercise.primary_muscle_group || 'Other';
+          const groupName = rawGroupName.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+          data[exercise.exercise_title] = groupName;
+        }
+        return data;
+      } else {
+        const data = await apiCall('/exercises/by-muscle-group');
+        const exerciseToGroup = {};
+        for (const [groupName, exercises] of Object.entries(data)) {
+          const capitalizedGroup = groupName.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+          exercises.forEach(ex => {
+            exerciseToGroup[ex.exercise_title] = capitalizedGroup;
+          });
+        }
+        return exerciseToGroup;
+      }
+    }
+
+    async function renderPRs(rows){
+      const thead = document.querySelector('#prsTbl thead tr');
+      const tbody = document.querySelector('#prsTbl tbody');
+      thead.innerHTML = ''; tbody.innerHTML = '';
+
+      if(!rows.length){
+        thead.innerHTML = '<th>Exercise</th>';
+        tbody.innerHTML = '<tr><td class="muted">No PRs in range</td></tr>';
+        return;
+      }
+
+      // Get muscle group data
+      const muscleGroupData = await getMuscleGroupData();
+
+      // Column order: exercise-like first, then numbers, then others
+      const keys = Object.keys(rows[0]);
+      const nameKeys = keys.filter(k=> /exercise|title|name/i.test(k));
+      const numKeys  = keys.filter(k=> typeof rows[0][k] === 'number' && !nameKeys.includes(k));
+      const other    = keys.filter(k=> !nameKeys.includes(k) && !numKeys.includes(k));
+
+      const columns = [...nameKeys, ...numKeys, ...other];
+
+      // Header
+      for(const k of columns){
+        const th = document.createElement('th');
+        th.textContent = k.replace(/_/g,' ');
+        thead.appendChild(th);
+      }
+
+      // Group exercises by muscle group
+      const groupedRows = {};
+      rows.forEach(row => {
+        const exerciseTitle = row.exercise_title || row.title || row.name || 'Unknown';
+        const muscleGroup = muscleGroupData[exerciseTitle] || 'Other';
+        
+        if (!groupedRows[muscleGroup]) {
+          groupedRows[muscleGroup] = [];
+        }
+        groupedRows[muscleGroup].push(row);
+      });
+
+      // Sort muscle groups alphabetically
+      const sortedGroups = Object.keys(groupedRows).sort();
+
+      // Render each group
+      sortedGroups.forEach(groupName => {
+        const groupRows = groupedRows[groupName];
+        
+        // Sort exercises within group by best-looking numeric key
+        const sortKey = autoDetectSortKey(groupRows);
+        if(sortKey){ 
+          groupRows.sort((a,b)=> (b[sortKey]||0) - (a[sortKey]||0)); 
+        }
+
+        // Add muscle group header row
+        const headerRow = document.createElement('tr');
+        headerRow.className = 'muscle-group-header-row';
+        headerRow.innerHTML = `<td colspan="${columns.length}" class="muscle-group-header-cell">${groupName}</td>`;
+        tbody.appendChild(headerRow);
+
+        // Add exercises for this group
+        groupRows.forEach(r=>{
+          const tr = document.createElement('tr');
+          tr.innerHTML = columns.map(k=>{
+            const v = r[k];
+            if(typeof v === 'number') return `<td>${Number.isFinite(v) ? Math.round(v*10)/10 : ''}</td>`;
+            if(v == null) return `<td></td>`;
+            return `<td>${String(v)}</td>`;
+          }).join('');
+          tbody.appendChild(tr);
+        });
+      });
+    }
+
+    async function loadPRs(){
+      const minReps = Number(document.getElementById('prsMinReps').value || 5);
+      const rows = await apiCall(`/stats/best_prs?min_reps=${minReps}`);
+      await renderPRs(rows);
+    }
+
+    // Initialize
+    (async () => {
+      await loadMuscleGroups();
+      await loadPRs(); // Load PRs on page load
+      // Auto-load progression if exercises are already selected
+      setTimeout(() => {
+        const selectedExercises = getSelectedExercises();
+        if (selectedExercises.length > 0) {
+          loadProgression();
+        }
+      }, 200);
+    })();
+  </script>
+
+  <style>
+    .progression-container {
+      padding: 0;
+    }
+    
+    .progression-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 30px;
+      align-items: start;
+      padding: 20px;
+    }
+    
+    .controls-panel h3 {
+      margin: 0 0 20px 0;
+      font-size: 18px;
+      color: var(--text);
+    }
+    
+    .exercise-list-header {
+      margin-bottom: 8px;
+    }
+    
+    .select-all-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--accent);
+      padding: 8px 10px;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+    
+    .select-all-label:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .select-all-checkbox {
+      margin: 0;
+    }
+    
+    .control-group {
+      margin-bottom: 20px;
+    }
+    
+    .control-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--text);
+    }
+    
+    .control-group select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238aa0b2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
+      padding-right: 40px;
+    }
+    
+    .control-group select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    
+    .control-group select:hover {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+
+    
+    .exercise-checkboxes {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      background: var(--bg);
+      
+      /* Custom scrollbar styling to match the design */
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    }
+    
+    .exercise-checkboxes::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .exercise-checkboxes::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 4px;
+    }
+    
+    .exercise-checkboxes::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      transition: background 0.2s ease;
+    }
+    
+    .exercise-checkboxes::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .exercise-checkboxes::-webkit-scrollbar-thumb:active {
+      background: rgba(255, 255, 255, 0.4);
+    }
+    
+    .exercise-checkbox-item {
+      margin-bottom: 0px;
+    }
+    
+    .exercise-checkbox-item:last-child {
+      margin-bottom: 0;
+    }
+    
+
+    
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      padding: 2px 10px;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+    
+    .checkbox-label:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .checkbox-label:has(input:checked) {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    
+    .exercise-checkbox {
+      margin: 0;
+    }
+    
+    .exercise-name {
+      flex: 1;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.4;
+    }
+    
+    .usage-count {
+      font-size: 11px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-weight: 500;
+      min-width: 20px;
+      text-align: center;
+    }
+    
+    .chart-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 500px;
+    }
+    
+    .chart-panel h3 {
+      margin: 0 0 20px 0;
+      font-size: 18px;
+      color: var(--text);
+      text-align: center;
+    }
+    
+    .chart-panel .chart-wrap {
+      height: 400px;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    
+    #empty {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      text-align: center;
+    }
+    
+    @media (max-width: 1024px) {
+      .progression-layout {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      
+      .chart-panel .chart-wrap {
+        height: 350px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .progression-layout {
+        gap: 15px;
+        padding: 15px;
+      }
+      
+      .exercise-checkboxes {
+        max-height: 250px;
+      }
+      
+      .chart-panel .chart-wrap {
+        height: 300px;
+      }
+    }
+  </style>
+</body>
+</html>
