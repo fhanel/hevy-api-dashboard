@@ -51,7 +51,7 @@ This is a personal project that creates a web-based dashboard for tracking and a
    ```
 
 4. **Access the dashboard**
-   Open your browser and go to `http://localhost:8000`
+   Open your browser and access the dashboard.
 
 ## Repository Structure
 
