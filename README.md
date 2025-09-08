@@ -8,7 +8,7 @@ This is a personal project that creates a web-based dashboard for tracking and a
 
 ## Features
 
-- **Weeklday heatmap**: Visual representation of workouts per week
+- **Weekday heatmap**: Visual representation of workouts per week
 - **Weekly volume graph**: Monitor weekly training volume and progression
 - **Weekly sets per muscle groups**: Track sets per muscle group over time
 - **Workout Details**: View of specific workouts and the exercises done
