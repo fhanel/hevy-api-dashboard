@@ -4,8 +4,6 @@ A workout tracker that uses the Hevy public API to pull and visualize your worko
 
 This is a personal project that creates a web-based dashboard for tracking and analyzing workouts from the public Hevy API.
 
-**Note:** This project has only been tested with my own workout data. Feel free to use and build upon. Read section on API usage below.
-
 ## Features
 
 - **Weekday heatmap**: Visual representation of workouts per week
